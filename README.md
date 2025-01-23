@@ -2,7 +2,7 @@
 
 ## Overview
 
-An advanced computer vision and machine learning application for comprehensive football (soccer) match video analysis. Leveraging state-of-the-art deep learning techniques, this project provides in-depth insights into player movements, team strategies, and match dynamics.
+Football match video analysis tool using AI and computer vision. Tracks players, analyzes team tactics, and generates performance insights. Built with Python, YOLOv8, and Flask.
 
 ## 📖 Acknowledgements
 This source code is referenced and developed based on the [Roboflow Sports Repository](https://github.com/roboflow/sports). Sincere thanks to the Roboflow development team for providing the initial reference and foundation for this project.
