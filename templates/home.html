@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+            height: 100vh;
+            margin: 0;
+            background-color: #E0FFE0; 
+            color: #006400; 
+        }
+        .container {
+            text-align: center;
+            transform: translateY(-20px); 
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #32CD32; 
+            color: white; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .buttons button:hover {
+            background-color: #228B22; 
+            transform: translateY(-2px); 
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.8); 
+            z-index: 1000; 
+            display: none; 
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #006400; 
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='image/logo.png') }}" alt="PTIT logo" class="logo">
+        <h1>Football AI</h1>
+        <p>Upload your video and start the analysis process. Once completed, you can view the results.</p>
+        <div class="buttons">
+            <button onclick="selectVideo()">Select Video</button>
+            <button onclick="processVideo()">Start Video Processing</button>
+            <button onclick="showOutput()">Show Results</button>
+            <button onclick="showPreviousOutput()">Show Recent Results</button>
+        </div>
+        <input type="file" id="videoInput" accept="video/*" style="display: none;">
+        <div id="status"></div>
+        <div class="spinner-container" id="spinner-container">
+            <div class="spinner" id="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        let sourceVideoPath = "";
+
+        function selectVideo() {
+            document.getElementById('videoInput').click();
+        }
+
+        document.getElementById('videoInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('status').innerText = data.error;
+                    } else {
+                        sourceVideoPath = data.file_path;
+                        document.getElementById('status').innerText = "Video selected";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('status').innerText = "Error uploading video.";
+                });
+            }
+        });
+
+        function processVideo() {
+            if (!sourceVideoPath) {
+                document.getElementById('status').innerText = "Please select a video.";
+                return;
+            }
+
+            document.getElementById('status').innerText = "Processing...";
+            document.getElementById('spinner-container').style.display = 'flex'; 
+
+            fetch('/process-video', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ file_path: sourceVideoPath })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('status').innerText = data.error;
+                } else {
+                    document.getElementById('status').innerText = "Video processing complete.";
+                }
+                document.getElementById('spinner-container').style.display = 'none'; 
+            })
+            .catch(error => {
+                document.getElementById('status').innerText = "Error processing video.";
+                document.getElementById('spinner-container').style.display = 'none'; 
+            });
+        }
+
+        function showOutput() {
+            window.location.href = '/video-list';
+        }
+
+        function showPreviousOutput() {
+            window.location.href = '/video-list';
+        }
+    </script>
+</body>
+</html>
