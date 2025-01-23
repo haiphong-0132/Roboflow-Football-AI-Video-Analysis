@@ -15,7 +15,7 @@ from functions.detection_annotators import (annotate_human, annotate_ball, annot
 
 def main(input_video: str, output_folder: str):
     # CONSTANT CONFIGURATION
-    API_KEY = '3Def0JUFoipsYZetEUac'
+    API_KEY = 'YOUR_API_KEY'
 
     CONFIG = SoccerPitchConfiguration()
 
